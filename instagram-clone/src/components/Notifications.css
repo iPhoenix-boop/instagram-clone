@@ -1,0 +1,694 @@
+components/Notifications.css .instagram-notifications {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    border: 1px solid #dbdbdb;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #dbdbdb;
+    background: white;
+}
+
+.notifications-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.mark-all-read {
+    background: none;
+    border: none;
+    color: #0095f6;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mark-all-read:hover {
+    color: #0081d6;
+}
+
+.notifications-tabs {
+    display: flex;
+    border-bottom: 1px solid #dbdbdb;
+    background: white;
+}
+
+.tab {
+    flex: 1;
+    padding: 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8e8e8e;
+    cursor: pointer;
+    position: relative;
+}
+
+.tab.active {
+    color: #262626;
+    border-bottom-color: #262626;
+}
+
+.unread-count {
+    background: #ed4956;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+}
+
+.notifications-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+}
+
+.notification-item {
+    display: flex;
+    padding: 16px;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #fafafa;
+    position: relative;
+}
+
+.notification-item:hover {
+    background: #fafafa;
+}
+
+.notification-item.unread {
+    background: #f0f8ff;
+}
+
+.notification-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border: 1px solid #dbdbdb;
+}
+
+.notification-content {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.users-avatars {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: #f8f9fa;
+    border: 1px solid #dbdbdb;
+    position: relative;
+}
+
+.verified-small {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #0095f6;
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+}
+
+.more-users {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #dbdbdb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #8e8e8e;
+    font-weight: 600;
+}
+
+.notification-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.usernames {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+}
+
+.username {
+    font-weight: 600;
+    color: #262626;
+    font-size: 14px;
+}
+
+.action-text {
+    font-size: 14px;
+    color: #262626;
+    margin-right: 8px;
+}
+
+.timestamp {
+    font-size: 12px;
+    color: #8e8e8e;
+}
+
+.post-preview {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    border: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.unread-indicator {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #0095f6;
+    border-radius: 50%;
+}
+
+.empty-notifications {
+    padding: 60px 20px;
+    text-align: center;
+    color: #8e8e8e;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-notifications h3 {
+    margin: 0 0 8px 0;
+    color: #262626;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.empty-notifications p {
+    margin: 0;
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+/* Scrollbar styling */
+.conversations-list::-webkit-scrollbar,
+.notifications-list::-webkit-scrollbar,
+.messages-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.conversations-list::-webkit-scrollbar-track,
+.notifications-list::-webkit-scrollbar-track,
+.messages-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.conversations-list::-webkit-scrollbar-thumb,
+.notifications-list::-webkit-scrollbar-thumb,
+.messages-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+/* components/Notifications.css */
+.instagram-notifications {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    border: 1px solid #dbdbdb;
+}
+
+/* ... (keep all the existing CSS styles the same) ... */
+
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    padding: 1px;
+}
+
+.avatar-image-small {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: white;
+}
+
+.post-preview {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    border: 1px solid #dbdbdb;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.post-preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ... (rest of the CSS remains the same) ... */
+.instagram-notifications {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #dbdbdb;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.notifications-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.mark-all-read {
+    background: none;
+    border: none;
+    color: #0095f6;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+.mark-all-read:hover {
+    color: #0081d6;
+}
+
+.notifications-tabs {
+    display: flex;
+    border-bottom: 1px solid #dbdbdb;
+    background: white;
+    position: sticky;
+    top: 57px;
+    z-index: 10;
+}
+
+.tab {
+    flex: 1;
+    padding: 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8e8e8e;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab.active {
+    color: #262626;
+    border-bottom-color: #262626;
+}
+
+.tab:hover {
+    background-color: #fafafa;
+}
+
+.notifications-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+}
+
+.notifications-section {
+    padding: 8px 0;
+}
+
+.section-header {
+    padding: 16px 16px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8e8e8e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #fafafa;
+    position: relative;
+    min-height: 60px;
+}
+
+.notification-item:hover {
+    background: #fafafa;
+}
+
+.notification-item.unread {
+    background: #f0f8ff;
+}
+
+/* User Avatar Styles */
+.user-avatar-small {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.avatar-image-small {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: white;
+    border: 2px solid white;
+}
+
+.verified-small {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #0095f6;
+    color: white;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+/* Multiple Users Avatar */
+.users-avatars {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.more-users {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #dbdbdb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #8e8e8e;
+    font-weight: 600;
+    border: 2px solid white;
+}
+
+/* Notification Content */
+.notification-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+
+.notification-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.usernames {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 2px;
+    line-height: 1.4;
+}
+
+.username {
+    font-weight: 600;
+    color: #262626;
+    font-size: 14px;
+}
+
+.action-text {
+    font-size: 14px;
+    color: #262626;
+    line-height: 1.4;
+}
+
+.timestamp {
+    font-size: 12px;
+    color: #8e8e8e;
+    margin-top: 2px;
+}
+
+/* Follow Button */
+.follow-btn {
+    background: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.follow-btn:hover {
+    background: #0081d6;
+}
+
+/* Notification Icons */
+.notification-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-icon.follow {
+    background: #e6f7ff;
+}
+
+.notification-icon.threads {
+    background: #f0f0f0;
+}
+
+.notification-icon.default {
+    background: #ffe6e6;
+}
+
+/* Unread Indicator */
+.unread-indicator {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #0095f6;
+    border-radius: 50%;
+}
+
+/* Empty State */
+.empty-notifications {
+    padding: 60px 20px;
+    text-align: center;
+    color: #8e8e8e;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-notifications h3 {
+    margin: 0 0 8px 0;
+    color: #262626;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.empty-notifications p {
+    margin: 0;
+    font-size: 14px;
+    color: #8e8e8e;
+}
+
+/* Scrollbar Styling */
+.notifications-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.notifications-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .instagram-notifications {
+        height: calc(100vh - 120px);
+        border-radius: 0;
+    }
+
+    .notification-item {
+        padding: 12px;
+    }
+
+    .user-avatar-small {
+        width: 40px;
+        height: 40px;
+    }
+
+    .more-users {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Text overflow handling */
+.usernames {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-text {
+    overflow: hidden;
+}
+
+/* Focus states for accessibility */
+.tab:focus,
+.mark-all-read:focus,
+.follow-btn:focus,
+.notification-item:focus {
+    outline: 2px solid #0095f6;
+    outline-offset: 2px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .instagram-notifications {
+        background: #000;
+        color: #fff;
+    }
+
+    .notifications-header,
+    .notifications-tabs {
+        background: #000;
+        border-bottom-color: #262626;
+    }
+
+    .notifications-header h2,
+    .tab.active {
+        color: #fff;
+    }
+
+    .notification-item:hover {
+        background: #121212;
+    }
+
+    .notification-item.unread {
+        background: #001933;
+    }
+}
