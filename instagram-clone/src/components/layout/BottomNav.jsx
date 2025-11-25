@@ -1,7 +1,5 @@
 
 
-
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,8 +13,8 @@ export default function BottomNav() {
 
     const isActive = (path) => location.pathname === path;
 
-    return (
-        <nav style={{
+    const styles = {
+        nav: {
             position: 'fixed',
             bottom: 0,
             left: 0,
@@ -24,100 +22,64 @@ export default function BottomNav() {
             backgroundColor: 'white',
             borderTop: '1px solid #dbdbdb',
             padding: '12px 0',
-            zIndex: 1000,
-            backdropFilter: 'blur(10px)'
-        }}>
+            zIndex: 1000
+        },
+        navItem: {
+            color: '#8e8e8e',
+            textDecoration: 'none',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            backgroundColor: 'transparent',
+            transition: 'all 0.3s ease'
+        },
+        activeNavItem: {
+            color: '#262626',
+            backgroundColor: '#f8f9fa'
+        },
+        userAvatar: {
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            background: 'linear-gradient(45deg, #ffd200, #f7971e, #e44d26, #4facfe)',
+            padding: '1px',
+            cursor: 'pointer'
+        },
+        avatarImg: {
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            border: '1.5px solid white'
+        }
+    };
+
+    return (
+        <nav style={styles.nav}>
             <div className="container">
                 <div className="d-flex justify-content-around align-items-center">
-                    <Link
-                        to="/"
-                        style={{
-                            color: isActive('/') ? '#262626' : '#8e8e8e',
-                            textDecoration: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            backgroundColor: isActive('/') ? '#f8f9fa' : 'transparent',
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Home"
-                    >
-                        <FaHome size={22} />
-                    </Link>
-                    <Link
-                        to="/search"
-                        style={{
-                            color: isActive('/search') ? '#262626' : '#8e8e8e',
-                            textDecoration: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            backgroundColor: isActive('/search') ? '#f8f9fa' : 'transparent',
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Search"
-                    >
-                        <FaSearch size={22} />
-                    </Link>
-                    <Link
-                        to="/create-post"
-                        style={{
-                            color: isActive('/create-post') ? '#262626' : '#8e8e8e',
-                            textDecoration: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            backgroundColor: isActive('/create-post') ? '#f8f9fa' : 'transparent',
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Create Post"
-                    >
-                        <FaPlusSquare size={22} />
-                    </Link>
-                    <Link
-                        to="/reels"
-                        style={{
-                            color: isActive('/reels') ? '#262626' : '#8e8e8e',
-                            textDecoration: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            backgroundColor: isActive('/reels') ? '#f8f9fa' : 'transparent',
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Reels"
-                    >
-                        <FaVideo size={22} />
-                    </Link>
-                    <Link
-                        to="/profile"
-                        style={{
-                            color: isActive('/profile') ? '#262626' : '#8e8e8e',
-                            textDecoration: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            backgroundColor: isActive('/profile') ? '#f8f9fa' : 'transparent',
-                            transition: 'all 0.3s ease'
-                        }}
-                        aria-label="Profile"
-                    >
-                        <div style={{
-                            width: '24px',
-                            height: '24px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(45deg, #ffd200, #f7971e, #e44d26, #4facfe)',
-                            padding: '1px',
-                            cursor: 'pointer'
-                        }}>
-                            <img
-                                src={user.avatar_url}
-                                alt={`${user.username}'s profile`}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover',
-                                    border: '1.5px solid white'
-                                }}
-                            />
-                        </div>
-                    </Link>
+                    {[
+                        { path: '/', icon: <FaHome size={22} />, label: 'Home' },
+                        { path: '/search', icon: <FaSearch size={22} />, label: 'Search' },
+                        { path: '/create-post', icon: <FaPlusSquare size={22} />, label: 'Create Post' },
+                        { path: '/reels', icon: <FaVideo size={22} />, label: 'Reels' },
+                        {
+                            path: '/profile', icon: <div style={styles.userAvatar}>
+                                <img src={user.avatar_url} alt={`${user.username}'s profile`} style={styles.avatarImg} />
+                            </div>, label: 'Profile'
+                        }
+                    ].map((item, index) => (
+                        <Link
+                            key={index}
+                            to={item.path}
+                            style={{
+                                ...styles.navItem,
+                                ...(isActive(item.path) ? styles.activeNavItem : {})
+                            }}
+                            aria-label={item.label}
+                        >
+                            {item.icon}
+                        </Link>
+                    ))}
                 </div>
             </div>
         </nav>

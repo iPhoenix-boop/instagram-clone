@@ -1,7 +1,10 @@
+
+
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FaInstagram } from 'react-icons/fa';
+import { FaInstagram, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function Signup() {
     const [formData, setFormData] = useState({
@@ -12,6 +15,7 @@ export default function Signup() {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { signUp } = useAuth();
     const navigate = useNavigate();
 
@@ -20,6 +24,10 @@ export default function Signup() {
             ...prev,
             [e.target.name]: e.target.value
         }));
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     const handleSubmit = async (e) => {
@@ -33,7 +41,10 @@ export default function Signup() {
                 fullName: formData.fullName
             });
             if (error) throw error;
-            navigate('/');
+
+            // Don't navigate immediately - require email verification
+            alert('Signup successful! Please check your email for verification link.');
+            navigate('/login');
         } catch (error) {
             setError(error.message);
         } finally {
@@ -69,7 +80,15 @@ export default function Signup() {
                     </p>
 
                     {error && (
-                        <div className="alert alert-danger" style={{ fontSize: '14px' }}>
+                        <div style={{
+                            backgroundColor: '#fee',
+                            border: '1px solid #fcc',
+                            color: '#c33',
+                            padding: '10px',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            marginBottom: '15px'
+                        }}>
                             {error}
                         </div>
                     )}
@@ -83,7 +102,7 @@ export default function Signup() {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb' }}
+                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb', width: '100%' }}
                         />
                         <input
                             type="text"
@@ -93,7 +112,7 @@ export default function Signup() {
                             value={formData.fullName}
                             onChange={handleChange}
                             required
-                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb' }}
+                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb', width: '100%' }}
                         />
                         <input
                             type="text"
@@ -103,23 +122,62 @@ export default function Signup() {
                             value={formData.username}
                             onChange={handleChange}
                             required
-                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb' }}
+                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb', width: '100%' }}
                         />
-                        <input
-                            type="password"
-                            name="password"
-                            className="form-control mb-3"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            style={{ fontSize: '12px', padding: '10px', backgroundColor: '#fafafa', border: '1px solid #dbdbdb' }}
-                        />
+
+                        {/* Password Input with Eye Toggle */}
+                        <div style={{ position: 'relative', marginBottom: '15px' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                className="form-control"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                style={{
+                                    fontSize: '12px',
+                                    padding: '10px 40px 10px 10px',
+                                    backgroundColor: '#fafafa',
+                                    border: '1px solid #dbdbdb',
+                                    width: '100%'
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#8e8e8e',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                            </button>
+                        </div>
+
                         <button
                             type="submit"
                             disabled={loading}
                             className="btn btn-primary w-100"
-                            style={{ backgroundColor: '#0095f6', border: 'none', fontSize: '14px', fontWeight: '600', padding: '8px' }}
+                            style={{
+                                backgroundColor: loading ? '#ccc' : '#0095f6',
+                                border: 'none',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                padding: '8px',
+                                opacity: loading ? 0.7 : 1,
+                                width: '100%'
+                            }}
                         >
                             {loading ? 'Signing up...' : 'Sign Up'}
                         </button>
@@ -143,3 +201,12 @@ export default function Signup() {
         </div>
     );
 }
+
+
+
+
+
+
+
+
+

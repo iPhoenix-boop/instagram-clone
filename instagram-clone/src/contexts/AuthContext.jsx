@@ -1,82 +1,126 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { currentUser, populateUserData } from '../data/mockData';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile as updateFirebaseProfile,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    onAuthStateChanged
+} from 'firebase/auth';
+import { auth, storage } from '../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const AuthContext = createContext();
 
-export function useAuth() {
-    return useContext(AuthContext);
-}
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate authentication with mock data
-        const initializeAuth = async () => {
-            // Check if we have a stored session
-            const storedUser = localStorage.getItem('instagram_user');
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
-            } else {
-                // For demo purposes, auto-login with mock user
-                setUser(currentUser);
-                localStorage.setItem('instagram_user', JSON.stringify(currentUser));
-            }
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUser(user);
             setLoading(false);
-        };
+        });
 
-        initializeAuth();
+        return unsubscribe;
     }, []);
 
-    const signUp = async (email, password, userData) => {
+    const signUp = async (email, password, displayName) => {
         try {
-            // Create mock user
-            const newUser = {
-                ...currentUser,
-                username: userData.username,
-                full_name: userData.fullName,
-                email: email
-            };
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
 
-            setUser(newUser);
-            localStorage.setItem('instagram_user', JSON.stringify(newUser));
+            if (displayName) {
+                await updateFirebaseProfile(user, { displayName });
+            }
 
-            return { data: { user: newUser }, error: null };
+            await sendEmailVerification(user);
+            return { success: true, user };
         } catch (error) {
-            return { data: null, error };
+            return { success: false, error: error.message };
         }
     };
 
     const signIn = async (email, password) => {
         try {
-            // For demo, any credentials work
-            const demoUser = {
-                ...currentUser,
-                email: email
-            };
-
-            setUser(demoUser);
-            localStorage.setItem('instagram_user', JSON.stringify(demoUser));
-
-            return { data: { user: demoUser }, error: null };
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            return { success: true, user: userCredential.user };
         } catch (error) {
-            return { data: null, error };
+            return { success: false, error: error.message };
         }
     };
 
-    const signOut = async () => {
-        setUser(null);
-        localStorage.removeItem('instagram_user');
-        return { error: null };
+    const signOutUser = async () => {
+        try {
+            await signOut(auth);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const updateProfile = async (updates) => {
+        try {
+            await updateFirebaseProfile(auth.currentUser, updates);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const uploadAvatar = async (file) => {
+        try {
+            const user = auth.currentUser;
+            if (!user) throw new Error('No user logged in');
+
+            const storageRef = ref(storage, `avatars/${user.uid}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            await updateFirebaseProfile(user, { photoURL: downloadURL });
+            return { success: true, photoURL: downloadURL };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const resendConfirmationEmail = async () => {
+        try {
+            await sendEmailVerification(auth.currentUser);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
+    const resetPassword = async (email) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     };
 
     const value = {
         user,
+        loading,
         signUp,
         signIn,
-        signOut,
-        loading
+        signOut: signOutUser,
+        updateProfile,
+        uploadAvatar,
+        resendConfirmationEmail,
+        resetPassword
     };
 
     return (
@@ -84,4 +128,10 @@ export function AuthProvider({ children }) {
             {!loading && children}
         </AuthContext.Provider>
     );
-}
+};
+
+export default AuthContext;
+
+
+
+

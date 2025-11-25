@@ -2,14 +2,29 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
-import './Messages.css';
+import { FaHeart, FaRegHeart, FaPaperPlane, FaCamera, FaImage, FaPaperclip, FaSmile, FaVideo, FaPhone, FaEllipsisV, FaCheck, FaCircle, FaEdit, FaSearch, FaArrowLeft } from 'react-icons/fa';
 
-const Messages = () => {
+export default function Messages() {
     const [conversations, setConversations] = useState([]);
     const [selectedChat, setSelectedChat] = useState(null);
     const [newMessage, setNewMessage] = useState('');
     const [messages, setMessages] = useState({});
+    const [isTyping, setIsTyping] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    // Check if device is mobile
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const mockConversations = [
@@ -22,7 +37,7 @@ const Messages = () => {
                     verified: false,
                     active: true
                 },
-                lastMessage: 'Hey! Check out my new post!',
+                lastMessage: "Hey! Check out my new post!",
                 timestamp: new Date(Date.now() - 2 * 60 * 1000),
                 unread: true,
             },
@@ -35,7 +50,7 @@ const Messages = () => {
                     verified: true,
                     active: false
                 },
-                lastMessage: 'Loved your story today!',
+                lastMessage: "Loved your story today!",
                 timestamp: new Date(Date.now() - 15 * 60 * 1000),
                 unread: false,
             },
@@ -48,83 +63,182 @@ const Messages = () => {
                     verified: false,
                     active: true
                 },
-                lastMessage: 'Thanks for the follow back!',
+                lastMessage: "Thanks for the follow back!",
                 timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
                 unread: false,
             }
         ];
         setConversations(mockConversations);
 
-        // Initialize messages for each conversation
         const initialMessages = {
             '1': [
-                { id: '1', text: 'Hey! Check out my new post!', sender: 'them', timestamp: new Date(Date.now() - 2 * 60 * 1000) },
-                { id: '2', text: 'Looks amazing! 🔥', sender: 'me', timestamp: new Date(Date.now() - 1 * 60 * 1000) },
-                { id: '3', text: 'Thanks! More coming soon 😊', sender: 'them', timestamp: new Date(Date.now() - 30 * 1000) }
+                {
+                    id: '1',
+                    text: "Hey! Check out my new post!",
+                    sender: 'them',
+                    timestamp: new Date(Date.now() - 2 * 60 * 1000),
+                    type: 'text'
+                },
+                {
+                    id: '2',
+                    text: "Looks amazing! 🔥",
+                    sender: 'me',
+                    timestamp: new Date(Date.now() - 1 * 60 * 1000),
+                    type: 'text'
+                },
+                {
+                    id: '3',
+                    text: "Thanks! More coming soon 😊",
+                    sender: 'them',
+                    timestamp: new Date(Date.now() - 30 * 1000),
+                    type: 'text'
+                }
             ],
             '2': [
-                { id: '1', text: 'Loved your story today!', sender: 'them', timestamp: new Date(Date.now() - 15 * 60 * 1000) },
-                { id: '2', text: 'Thank you! 🥰', sender: 'me', timestamp: new Date(Date.now() - 10 * 60 * 1000) }
+                {
+                    id: '1',
+                    text: "Loved your story today!",
+                    sender: 'them',
+                    timestamp: new Date(Date.now() - 15 * 60 * 1000),
+                    type: 'text'
+                },
+                {
+                    id: '2',
+                    text: "Thank you! 🥰",
+                    sender: 'me',
+                    timestamp: new Date(Date.now() - 10 * 60 * 1000),
+                    type: 'text'
+                }
             ],
             '3': [
-                { id: '1', text: 'Thanks for the follow back!', sender: 'them', timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000) },
-                { id: '2', text: 'No problem! Love your content 🙌', sender: 'me', timestamp: new Date(Date.now() - 50 * 60 * 1000) }
+                {
+                    id: '1',
+                    text: "Thanks for the follow back!",
+                    sender: 'them',
+                    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
+                    type: 'text'
+                },
+                {
+                    id: '2',
+                    text: "No problem! Love your content 🙌",
+                    sender: 'me',
+                    timestamp: new Date(Date.now() - 50 * 60 * 1000),
+                    type: 'text'
+                }
             ]
         };
         setMessages(initialMessages);
     }, []);
 
-    // Auto-scroll to bottom when new messages are added
     useEffect(() => {
-        scrollToBottom();
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, selectedChat]);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    // Filter conversations based on search query
+    const filteredConversations = conversations.filter(conv =>
+        conv.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        conv.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        conv.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const sendMessage = (chatId) => {
-        if (!newMessage.trim()) return;
+    const sendMessage = (chatId, messageType = 'text', content = null) => {
+        let newMsg;
 
-        const newMsg = {
-            id: Date.now().toString(),
-            text: newMessage,
-            sender: 'me',
-            timestamp: new Date()
-        };
+        if (messageType === 'text') {
+            if (!newMessage.trim()) return;
+            newMsg = {
+                id: Date.now().toString(),
+                text: newMessage,
+                sender: 'me',
+                timestamp: new Date(),
+                type: 'text'
+            };
+            setNewMessage('');
+        } else if (messageType === 'image') {
+            newMsg = {
+                id: Date.now().toString(),
+                imageUrl: content,
+                sender: 'me',
+                timestamp: new Date(),
+                type: 'image'
+            };
+        } else if (messageType === 'like') {
+            newMsg = {
+                id: Date.now().toString(),
+                type: 'like',
+                sender: 'me',
+                timestamp: new Date()
+            };
+        }
 
         setMessages(prev => ({
             ...prev,
             [chatId]: [...(prev[chatId] || []), newMsg]
         }));
 
-        // Update the last message in conversations
-        setConversations(prev =>
-            prev.map(conv =>
-                conv.id === chatId
-                    ? { ...conv, lastMessage: newMessage, timestamp: new Date() }
-                    : conv
-            )
-        );
+        if (messageType === 'text') {
+            setConversations(prev => prev.map(conv =>
+                conv.id === chatId ? { ...conv, lastMessage: newMessage, timestamp: new Date() } : conv
+            ));
+        }
 
-        setNewMessage('');
+        // Simulate typing and reply
+        if (messageType === 'text') {
+            setIsTyping(true);
+            setTimeout(() => {
+                const autoReply = {
+                    id: Date.now().toString() + '_reply',
+                    text: "That's awesome! 😊",
+                    sender: 'them',
+                    timestamp: new Date(),
+                    type: 'text'
+                };
+                setMessages(prev => ({
+                    ...prev,
+                    [chatId]: [...(prev[chatId] || []), autoReply]
+                }));
+                setIsTyping(false);
+            }, 2000);
+        }
     };
 
     const handleKeyPress = (e, chatId) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage(chatId);
+            sendMessage(chatId, 'text');
         }
+    };
+
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                sendMessage(selectedChat.id, 'image', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const sendLike = (chatId) => {
+        sendMessage(chatId, 'like');
     };
 
     const formatTime = (date) => {
         const now = new Date();
         const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-
         if (diffInMinutes < 1) return 'now';
         if (diffInMinutes < 60) return `${diffInMinutes}m`;
         if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
         return `${Math.floor(diffInMinutes / 1440)}d`;
+    };
+
+    const formatMessageTime = (date) => {
+        return new Date(date).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
     };
 
     const markAsRead = (chatId) => {
@@ -138,236 +252,529 @@ const Messages = () => {
         markAsRead(conversation.id);
     };
 
-    const handleFileUpload = (type) => {
-        // Simulate file upload functionality
-        alert(`Would open ${type} picker in real implementation`);
+    const triggerFileInput = () => {
+        fileInputRef.current?.click();
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
+    };
+
+    const handleBackClick = () => {
+        setSelectedChat(null);
+    };
+
+    // Responsive styles
+    const styles = {
+        container: {
+            maxWidth: '600px',
+            margin: '0 auto',
+            height: isMobile ? '100vh' : 'calc(100vh - 120px)',
+            backgroundColor: 'white',
+            border: isMobile ? 'none' : '1px solid #dbdbdb',
+            overflow: 'hidden'
+        },
+        header: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: isMobile ? '12px 16px' : '16px',
+            borderBottom: '1px solid #dbdbdb',
+            backgroundColor: 'white',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            minHeight: '60px',
+            boxSizing: 'border-box'
+        },
+        backBtn: {
+            background: 'none',
+            border: 'none',
+            fontSize: isMobile ? '18px' : '20px',
+            cursor: 'pointer',
+            padding: isMobile ? '8px 12px 8px 0' : '8px',
+            color: '#262626',
+            display: 'flex',
+            alignItems: 'center'
+        },
+        iconBtn: {
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: isMobile ? '8px' : '8px',
+            color: '#262626',
+            fontSize: isMobile ? '16px' : '18px',
+            minWidth: '40px',
+            minHeight: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        searchContainer: {
+            padding: isMobile ? '12px 16px' : '16px',
+            position: 'relative',
+            backgroundColor: 'white'
+        },
+        searchInput: {
+            width: '100%',
+            padding: isMobile ? '12px 16px 12px 40px' : '12px 16px 12px 40px',
+            border: '1px solid #dbdbdb',
+            borderRadius: '20px',
+            fontSize: isMobile ? '14px' : '14px',
+            outline: 'none',
+            backgroundColor: '#fafafa',
+            transition: 'all 0.3s ease',
+            boxSizing: 'border-box',
+            WebkitAppearance: 'none',
+        },
+        searchIcon: {
+            position: 'absolute',
+            left: isMobile ? '28px' : '28px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#8e8e8e',
+            fontSize: '14px',
+            pointerEvents: 'none'
+        },
+        clearButton: {
+            position: 'absolute',
+            right: isMobile ? '28px' : '28px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            color: '#8e8e8e',
+            cursor: 'pointer',
+            padding: '4px',
+            fontSize: '14px',
+            borderRadius: '50%',
+            width: '20px',
+            height: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        conversationItem: {
+            display: 'flex',
+            alignItems: 'center',
+            padding: isMobile ? '14px 16px' : '16px',
+            cursor: 'pointer',
+            borderBottom: '1px solid #f0f0f0',
+            transition: 'background-color 0.3s ease',
+            minHeight: '72px',
+            boxSizing: 'border-box'
+        },
+        userAvatar: {
+            width: isMobile ? '50px' : '56px',
+            height: isMobile ? '50px' : '56px',
+            borderRadius: '50%',
+            marginRight: isMobile ? '12px' : '12px',
+            border: '2px solid #e1306c',
+            padding: '2px',
+            position: 'relative',
+            flexShrink: 0
+        },
+        avatarImage: {
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            objectFit: 'cover'
+        },
+        activeDot: {
+            position: 'absolute',
+            bottom: '2px',
+            right: '2px',
+            width: isMobile ? '10px' : '12px',
+            height: isMobile ? '10px' : '12px',
+            backgroundColor: '#4CAF50',
+            border: '2px solid white',
+            borderRadius: '50%'
+        },
+        messageBubble: {
+            maxWidth: isMobile ? '85%' : '70%',
+            padding: isMobile ? '10px 14px' : '12px 16px',
+            borderRadius: '18px',
+            marginBottom: '8px',
+            position: 'relative',
+            wordWrap: 'break-word',
+            wordBreak: 'break-word'
+        },
+        myMessage: {
+            backgroundColor: '#0095f6',
+            color: 'white',
+            marginLeft: 'auto',
+            borderBottomRightRadius: '4px'
+        },
+        theirMessage: {
+            backgroundColor: '#f0f0f0',
+            color: '#262626',
+            borderBottomLeftRadius: '4px'
+        },
+        messageTime: {
+            fontSize: isMobile ? '10px' : '11px',
+            opacity: 0.7,
+            marginTop: '4px',
+            textAlign: 'right'
+        },
+        imageMessage: {
+            maxWidth: isMobile ? '200px' : '250px',
+            maxHeight: '300px',
+            borderRadius: '12px',
+            margin: '4px 0',
+            objectFit: 'cover'
+        },
+        likeMessage: {
+            padding: isMobile ? '6px 10px' : '8px 12px',
+            borderRadius: '18px',
+            backgroundColor: '#f0f0f0',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: isMobile ? '13px' : '14px',
+            color: '#262626'
+        },
+        inputContainer: {
+            display: 'flex',
+            alignItems: 'center',
+            padding: isMobile ? '12px 16px' : '16px',
+            borderTop: '1px solid #dbdbdb',
+            backgroundColor: 'white',
+            position: 'sticky',
+            bottom: 0,
+            gap: isMobile ? '6px' : '8px',
+            minHeight: '60px',
+            boxSizing: 'border-box'
+        },
+        messageInput: {
+            flex: 1,
+            border: 'none',
+            outline: 'none',
+            padding: isMobile ? '10px 14px' : '12px 16px',
+            fontSize: isMobile ? '16px' : '14px',
+            backgroundColor: 'transparent',
+            resize: 'none',
+            maxHeight: '100px',
+            borderRadius: '20px',
+            backgroundColor: '#fafafa',
+            minHeight: '40px'
+        },
+        inputIcon: {
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: isMobile ? '8px' : '8px',
+            color: '#8e8e8e',
+            fontSize: isMobile ? '18px' : '20px',
+            transition: 'color 0.2s ease',
+            minWidth: '40px',
+            minHeight: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%'
+        },
+        activeInputIcon: {
+            color: '#0095f6'
+        },
+        chatHeader: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: isMobile ? '10px' : '12px',
+            padding: isMobile ? '12px 16px' : '12px 16px',
+            borderBottom: '1px solid #dbdbdb',
+            backgroundColor: 'white',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            minHeight: '60px',
+            boxSizing: 'border-box'
+        },
+        typingIndicator: {
+            padding: isMobile ? '6px 16px' : '8px 16px',
+            color: '#8e8e8e',
+            fontSize: isMobile ? '11px' : '12px',
+            fontStyle: 'italic'
+        },
+        noResults: {
+            textAlign: 'center',
+            padding: isMobile ? '40px 20px' : '40px 20px',
+            color: '#8e8e8e',
+            fontSize: '14px'
+        },
+        messagesContainer: {
+            flex: 1,
+            padding: isMobile ? '12px 16px' : '16px',
+            overflowY: 'auto',
+            backgroundColor: '#fafafa',
+            WebkitOverflowScrolling: 'touch'
+        },
+        conversationsContainer: {
+            height: 'calc(100% - 73px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
+        }
     };
 
     return (
-        <div className="instagram-messages">
-            <div className="messages-header">
-                <div className="header-left">
+        <div style={styles.container}>
+            {/* Hidden file input for image uploads */}
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                accept="image/*"
+                style={{ display: 'none' }}
+            />
+
+            <div style={styles.header}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {selectedChat && (
-                        <button
-                            className="back-btn"
-                            onClick={() => setSelectedChat(null)}
-                            aria-label="Back to conversations"
-                        >
-                            ‹
+                        <button onClick={handleBackClick} style={styles.backBtn}>
+                            {isMobile ? <FaArrowLeft /> : '‹'}
                         </button>
                     )}
-                    <h2>{selectedChat ? selectedChat.user.username : 'iPhoenix'}</h2>
+                    <h2 style={{
+                        margin: 0,
+                        fontSize: isMobile ? '16px' : '18px',
+                        fontWeight: '600'
+                    }}>
+                        {selectedChat ? selectedChat.user.username : 'iPhoenix'}
+                    </h2>
                 </div>
-                <div className="header-right">
+                <div style={{ display: 'flex', gap: isMobile ? '8px' : '12px' }}>
                     {selectedChat ? (
                         <>
-                            <button className="icon-btn" aria-label="Video call">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17 10.5V7C17 4.243 14.757 2 12 2C9.243 2 7 4.243 7 7V10.5C5.343 10.5 4 11.843 4 13.5V18.5C4 20.157 5.343 21.5 7 21.5H17C18.657 21.5 20 20.157 20 18.5V13.5C20 11.843 18.657 10.5 17 10.5Z" fill="currentColor" />
-                                    <path d="M12 16.5C11.448 16.5 11 16.052 11 15.5C11 14.948 11.448 14.5 12 14.5C12.552 14.5 13 14.948 13 15.5C13 16.052 12.552 16.5 12 16.5Z" fill="currentColor" />
-                                </svg>
+                            <button style={styles.iconBtn} title="Video call">
+                                <FaVideo />
                             </button>
-                            <button className="icon-btn" aria-label="Call">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 15.5C18.75 15.5 17.55 15.3 16.43 14.93C16.33 14.9 16.22 14.88 16.12 14.88C15.86 14.88 15.61 14.98 15.41 15.17L13.21 17.37C10.38 15.93 8.06 13.62 6.62 10.79L8.82 8.59C9.1 8.31 9.18 7.92 9.07 7.57C8.7 6.45 8.5 5.25 8.5 4C8.5 3.45 8.05 3 7.5 3H4C3.45 3 3 3.45 3 4C3 13.39 10.61 21 20 21C20.55 21 21 20.55 21 20V16.5C21 15.95 20.55 15.5 20 15.5Z" fill="currentColor" />
-                                </svg>
+                            <button style={styles.iconBtn} title="Voice call">
+                                <FaPhone />
+                            </button>
+                            <button style={styles.iconBtn} title="Chat info">
+                                <FaEllipsisV />
                             </button>
                         </>
                     ) : (
-                        <button className="icon-btn" aria-label="New message">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.486 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.514 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z" fill="currentColor" />
-                                <path d="M13 7H11V11H7V13H11V17H13V13H17V11H13V7Z" fill="currentColor" />
-                            </svg>
+                        <button style={styles.iconBtn} title="New message">
+                            <FaEdit />
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="messages-content">
-                {!selectedChat ? (
-                    /* Conversations List View */
-                    <div className="conversations-list">
-                        <div className="conversations-header">
-                            <h3>iPhoenix</h3>
-                            <button className="icon-btn" aria-label="New message">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C6.486 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.514 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z" fill="currentColor" />
-                                    <path d="M13 7H11V11H7V13H11V17H13V13H17V11H13V7Z" fill="currentColor" />
-                                </svg>
+            {!selectedChat ? (
+                // Conversations List
+                <div style={styles.conversationsContainer}>
+                    {/* Responsive Search Bar */}
+                    <div style={styles.searchContainer}>
+                        <FaSearch style={styles.searchIcon} />
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={styles.searchInput}
+                        />
+                        {searchQuery && (
+                            <button onClick={clearSearch} style={styles.clearButton}>
+                                ✕
                             </button>
-                        </div>
+                        )}
+                    </div>
 
-                        <div className="search-bar">
-                            <input
-                                type="text"
-                                placeholder="Search"
-                                className="search-input"
-                                aria-label="Search conversations"
-                            />
+                    {filteredConversations.length > 0 ? filteredConversations.map(conv => (
+                        <div
+                            key={conv.id}
+                            style={styles.conversationItem}
+                            onClick={() => handleChatSelect(conv)}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fafafa'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                            <div style={{ position: 'relative' }}>
+                                <div style={styles.userAvatar}>
+                                    <img
+                                        src={conv.user.avatar_url}
+                                        alt={conv.user.username}
+                                        style={styles.avatarImage}
+                                    />
+                                </div>
+                                {conv.user.active && <div style={styles.activeDot} />}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                    <strong style={{
+                                        fontSize: isMobile ? '14px' : '14px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {conv.user.username}
+                                    </strong>
+                                    {conv.user.verified && <FaCheck style={{ color: '#0095f6', fontSize: '12px', flexShrink: 0 }} />}
+                                    <span style={{
+                                        fontSize: isMobile ? '11px' : '12px',
+                                        color: '#8e8e8e',
+                                        marginLeft: 'auto',
+                                        flexShrink: 0
+                                    }}>
+                                        {formatTime(conv.timestamp)}
+                                    </span>
+                                </div>
+                                <p style={{
+                                    margin: 0,
+                                    color: '#8e8e8e',
+                                    fontSize: isMobile ? '13px' : '14px',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>
+                                    {conv.lastMessage}
+                                </p>
+                            </div>
+                            {conv.unread && (
+                                <FaCircle style={{ color: '#0095f6', fontSize: '8px', flexShrink: 0 }} />
+                            )}
                         </div>
+                    )) : searchQuery ? (
+                        <div style={styles.noResults}>
+                            No conversations found for "{searchQuery}"
+                        </div>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '40px', color: '#8e8e8e' }}>
+                            <div style={{ fontSize: isMobile ? '40px' : '48px', marginBottom: '16px' }}>💬</div>
+                            <h3 style={{ fontSize: isMobile ? '16px' : '18px' }}>No conversations yet</h3>
+                            <p style={{ fontSize: isMobile ? '14px' : '16px' }}>When you start conversations, they'll appear here.</p>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                // Chat View
+                <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 73px)' }}>
+                    {/* Chat Header */}
+                    <div style={styles.chatHeader}>
+                        <div style={{ position: 'relative' }}>
+                            <div style={styles.userAvatar}>
+                                <img
+                                    src={selectedChat.user.avatar_url}
+                                    alt={selectedChat.user.username}
+                                    style={styles.avatarImage}
+                                />
+                            </div>
+                            {selectedChat.user.active && <div style={styles.activeDot} />}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{
+                                fontSize: isMobile ? '14px' : '14px',
+                                fontWeight: '600',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                            }}>
+                                {selectedChat.user.username}
+                                {selectedChat.user.verified && <FaCheck style={{ color: '#0095f6', fontSize: '12px', marginLeft: '4px' }} />}
+                            </div>
+                            <div style={{ fontSize: isMobile ? '11px' : '12px', color: '#8e8e8e' }}>
+                                {selectedChat.user.active ? 'Active now' : formatTime(selectedChat.timestamp)}
+                            </div>
+                        </div>
+                    </div>
 
-                        {conversations.map(conversation => (
-                            <div
-                                key={conversation.id}
-                                className={`conversation-item ${conversation.unread ? 'unread' : ''}`}
-                                onClick={() => handleChatSelect(conversation)}
-                            >
-                                <div className="avatar-container">
-                                    <div className={`user-avatar ${conversation.user.active ? 'active' : ''}`}>
+                    {/* Messages Area */}
+                    <div style={styles.messagesContainer}>
+                        {(messages[selectedChat.id] || []).map(msg => (
+                            <div key={msg.id}>
+                                {msg.type === 'text' && (
+                                    <div style={{ ...styles.messageBubble, ...(msg.sender === 'me' ? styles.myMessage : styles.theirMessage) }}>
+                                        <p style={{ margin: 0, lineHeight: '1.4' }}>{msg.text}</p>
+                                        <div style={styles.messageTime}>
+                                            {formatMessageTime(msg.timestamp)}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {msg.type === 'image' && (
+                                    <div style={{ ...styles.messageBubble, ...(msg.sender === 'me' ? styles.myMessage : styles.theirMessage), padding: '8px' }}>
                                         <img
-                                            src={conversation.user.avatar_url}
-                                            alt={conversation.user.username}
-                                            className="avatar-image"
-                                            onError={(e) => {
-                                                e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face';
-                                            }}
+                                            src={msg.imageUrl}
+                                            alt="Shared content"
+                                            style={styles.imageMessage}
                                         />
+                                        <div style={styles.messageTime}>
+                                            {formatMessageTime(msg.timestamp)}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="conversation-info">
-                                    <div className="user-info">
-                                        <span className="username">{conversation.user.username}</span>
-                                        {conversation.user.verified && <span className="verified">✓</span>}
-                                        <span className="time">{formatTime(conversation.timestamp)}</span>
+                                )}
+
+                                {msg.type === 'like' && (
+                                    <div style={{ ...styles.messageBubble, ...(msg.sender === 'me' ? styles.myMessage : styles.theirMessage) }}>
+                                        <div style={styles.likeMessage}>
+                                            <FaHeart style={{ color: '#ed4956' }} />
+                                            <span>Liked a message</span>
+                                        </div>
+                                        <div style={styles.messageTime}>
+                                            {formatMessageTime(msg.timestamp)}
+                                        </div>
                                     </div>
-                                    <div className="last-message">
-                                        <p>{conversation.lastMessage}</p>
-                                        {conversation.unread && <div className="unread-dot"></div>}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         ))}
+
+                        {isTyping && (
+                            <div style={styles.typingIndicator}>
+                                {selectedChat.user.username} is typing...
+                            </div>
+                        )}
+
+                        <div ref={messagesEndRef} />
                     </div>
-                ) : (
-                    /* Chat View */
-                    <div className="chat-area">
-                        <div className="active-chat">
-                            <div className="chat-header">
-                                <div className="chat-header-left">
-                                    <button
-                                        className="back-btn"
-                                        onClick={() => setSelectedChat(null)}
-                                        aria-label="Back to conversations"
-                                    >
-                                        ‹
-                                    </button>
-                                    <div className="chat-user">
-                                        <div className={`user-avatar ${selectedChat.user.active ? 'active' : ''}`}>
-                                            <img
-                                                src={selectedChat.user.avatar_url}
-                                                alt={selectedChat.user.username}
-                                                className="avatar-image"
-                                                onError={(e) => {
-                                                    e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face';
-                                                }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <span className="username">{selectedChat.user.username}</span>
-                                            {selectedChat.user.verified && <span className="verified">✓</span>}
-                                            <div className="user-status">{selectedChat.user.active ? 'Active now' : formatTime(selectedChat.timestamp)}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button className="icon-btn" aria-label="Chat info">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="currentColor" />
-                                        <path d="M11 7H13V9H11V7ZM11 11H13V17H11V11Z" fill="currentColor" />
-                                    </svg>
-                                </button>
-                            </div>
 
-                            <div className="messages-container">
-                                <div className="messages-list">
-                                    {(messages[selectedChat.id] || []).map(message => (
-                                        <div key={message.id} className={`message-bubble ${message.sender}`}>
-                                            <p>{message.text}</p>
-                                            <span className="message-time">{formatTime(message.timestamp)}</span>
-                                        </div>
-                                    ))}
-                                    <div ref={messagesEndRef} />
-                                </div>
-                            </div>
+                    {/* Input Area */}
+                    <div style={styles.inputContainer}>
+                        <button
+                            onClick={triggerFileInput}
+                            style={styles.inputIcon}
+                            title="Add photo or media"
+                        >
+                            <FaImage />
+                        </button>
 
-                            {/* Instagram-style Message Input Box */}
-                            <div className="message-input-container">
-                                <div className="message-input-wrapper">
-                                    {/* Camera Icon */}
-                                    <button
-                                        className="input-icon camera-btn"
-                                        onClick={() => handleFileUpload('camera')}
-                                        aria-label="Take photo or video"
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" fill="currentColor" />
-                                            <path d="M20 4H16.83L15.59 2.65C15.22 2.24 14.68 2 14.12 2H9.88C9.32 2 8.78 2.24 8.41 2.65L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
+                        <button
+                            onClick={triggerFileInput}
+                            style={styles.inputIcon}
+                            title="Take photo or video"
+                        >
+                            <FaCamera />
+                        </button>
 
-                                    {/* Photo/Media Icon */}
-                                    <button
-                                        className="input-icon media-btn"
-                                        onClick={() => handleFileUpload('media')}
-                                        aria-label="Add photo or media"
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
+                        <textarea
+                            placeholder="Message..."
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyPress={(e) => handleKeyPress(e, selectedChat.id)}
+                            style={styles.messageInput}
+                            rows="1"
+                        />
 
-                                    {/* PDF/Attachment Icon */}
-                                    <button
-                                        className="input-icon attachment-btn"
-                                        onClick={() => handleFileUpload('attachment')}
-                                        aria-label="Add attachment"
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M16.5 6V17.5C16.5 19.71 14.71 21.5 12.5 21.5C10.29 21.5 8.5 19.71 8.5 17.5V5C8.5 3.62 9.62 2.5 11 2.5C12.38 2.5 13.5 3.62 13.5 5V15.5C13.5 16.05 13.05 16.5 12.5 16.5C11.95 16.5 11.5 16.05 11.5 15.5V6H10V15.5C10 16.88 11.12 18 12.5 18C13.88 18 15 16.88 15 15.5V5C15 2.79 13.21 1 11 1C8.79 1 7 2.79 7 5V17.5C7 20.54 9.46 23 12.5 23C15.54 23 18 20.54 18 17.5V6H16.5Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Message Input */}
-                                    <input
-                                        type="text"
-                                        placeholder="Message..."
-                                        value={newMessage}
-                                        onChange={(e) => setNewMessage(e.target.value)}
-                                        onKeyPress={(e) => handleKeyPress(e, selectedChat.id)}
-                                        className="message-input"
-                                        aria-label="Type a message"
-                                    />
-
-                                    {/* Like/Heart Icon */}
-                                    <button
-                                        className="input-icon like-btn"
-                                        aria-label="Send like"
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M16.5 3C14.76 3 13.09 3.81 12 5.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5C2 12.28 5.4 15.36 10.55 20.04L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3ZM12.1 18.55L12 18.65L11.9 18.55C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5C9.04 5 10.54 5.99 11.07 7.36H12.94C13.46 5.99 14.96 5 16.5 5C18.5 5 20 6.5 20 8.5C20 11.39 16.86 14.24 12.1 18.55Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Send Button - Only shows when there's text */}
-                                    {newMessage.trim() && (
-                                        <button
-                                            className="input-icon send-btn active"
-                                            onClick={() => sendMessage(selectedChat.id)}
-                                            aria-label="Send message"
-                                        >
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
-                                            </svg>
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        {newMessage.trim() ? (
+                            <button
+                                onClick={() => sendMessage(selectedChat.id, 'text')}
+                                style={{ ...styles.inputIcon, ...styles.activeInputIcon }}
+                                title="Send"
+                            >
+                                <FaPaperPlane />
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => sendLike(selectedChat.id)}
+                                style={{ ...styles.inputIcon, color: '#ed4956' }}
+                                title="Send like"
+                            >
+                                <FaHeart />
+                            </button>
+                        )}
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
-};
-
-export default Messages;
+}

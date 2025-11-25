@@ -1,13 +1,19 @@
+
+
+
+
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaInstagram, FaFacebook, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const { signIn } = useAuth();
     const navigate = useNavigate();
 
@@ -18,13 +24,27 @@ export default function Login() {
 
         try {
             const { error } = await signIn(email, password);
-            if (error) throw error;
+            if (error) {
+                setError(error.message);
+                return;
+            }
             navigate('/');
         } catch (error) {
-            setError(error.message);
+            setError('An unexpected error occurred. Please try again.');
+            console.error('Login error:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleForgotPassword = (e) => {
+        e.preventDefault();
+        // For demo purposes, just show an alert
+        alert('Forgot password feature would be implemented here. In a real app, this would send a password reset email.');
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
     };
 
     return (
@@ -52,7 +72,15 @@ export default function Login() {
                     <FaInstagram style={{ fontSize: '3rem', marginBottom: '20px', color: '#262626' }} />
 
                     {error && (
-                        <div className="alert alert-danger" style={{ fontSize: '14px' }}>
+                        <div style={{
+                            backgroundColor: '#fee',
+                            border: '1px solid #fcc',
+                            color: '#c33',
+                            padding: '10px',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            marginBottom: '15px'
+                        }}>
                             {error}
                         </div>
                     )}
@@ -72,30 +100,57 @@ export default function Login() {
                                 border: '1px solid #dbdbdb'
                             }}
                         />
-                        <input
-                            type="password"
-                            className="form-control mb-3"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            style={{
-                                fontSize: '12px',
-                                padding: '10px',
-                                backgroundColor: '#fafafa',
-                                border: '1px solid #dbdbdb'
-                            }}
-                        />
+
+                        {/* Password Input with Eye Toggle */}
+                        <div style={{ position: 'relative', marginBottom: '15px' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                className="form-control"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                style={{
+                                    fontSize: '12px',
+                                    padding: '10px 40px 10px 10px',
+                                    backgroundColor: '#fafafa',
+                                    border: '1px solid #dbdbdb',
+                                    width: '100%'
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#8e8e8e',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                            </button>
+                        </div>
+
                         <button
                             type="submit"
                             disabled={loading}
                             className="btn btn-primary w-100"
                             style={{
-                                backgroundColor: '#0095f6',
+                                backgroundColor: loading ? '#ccc' : '#0095f6',
                                 border: 'none',
                                 fontSize: '14px',
                                 fontWeight: '600',
-                                padding: '8px'
+                                padding: '8px',
+                                opacity: loading ? 0.7 : 1
                             }}
                         >
                             {loading ? 'Logging in...' : 'Log In'}
@@ -129,15 +184,22 @@ export default function Login() {
                         Log in with Facebook
                     </button>
 
-                    <a href="#" style={{
-                        fontSize: '12px',
-                        color: '#00376b',
-                        display: 'block',
-                        marginTop: '15px',
-                        textDecoration: 'none'
-                    }}>
+                    <button
+                        onClick={handleForgotPassword}
+                        style={{
+                            fontSize: '12px',
+                            color: '#00376b',
+                            display: 'block',
+                            marginTop: '15px',
+                            textDecoration: 'none',
+                            border: 'none',
+                            background: 'none',
+                            cursor: 'pointer',
+                            width: '100%'
+                        }}
+                    >
                         Forgot password?
-                    </a>
+                    </button>
                 </div>
 
                 {/* Sign up card */}
@@ -158,3 +220,5 @@ export default function Login() {
         </div>
     );
 }
+
+

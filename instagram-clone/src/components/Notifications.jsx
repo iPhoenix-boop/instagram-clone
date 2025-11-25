@@ -1,260 +1,181 @@
 import React, { useState } from 'react';
-import './Notifications.css';
+// import { useTranslation } from 'react-i18next'; // REMOVED
 
 export default function Notifications() {
+    // const { t } = useTranslation(); // REMOVED
     const [activeTab, setActiveTab] = useState('all');
 
-    // Sample notifications data exactly matching your image
     const notificationsData = [
         {
-            id: '1',
-            period: '7days',
-            users: [
-                {
-                    username: 'navi__7',
-                    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-                    verified: false
-                }
-            ],
-            message: 'is on Instagram. chakri__0 follows them.',
-            timestamp: '2d',
-            type: 'follow',
-            hasFollowButton: true,
-            is_read: false
+            id: '1', period: '7days',
+            users: [{ username: 'navi__7', avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face', verified: false }],
+            message: `is on Instagram. chakri__0 follows them.`,
+            timestamp: '2d', type: 'follow', hasFollowButton: true, is_read: false
         },
         {
-            id: '2',
-            period: '30days',
-            users: [
-                {
-                    username: 'mr_sagar__',
-                    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-                    verified: false
-                }
-            ],
-            message: 'is on Instagram. puppy_pavan_07 follows them.',
-            timestamp: '1w',
-            type: 'follow',
-            hasFollowButton: true,
-            is_read: false
+            id: '2', period: '30days',
+            users: [{ username: 'mr_sagar__', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face', verified: false }],
+            message: `is on Instagram. puppy_pavan_07 follows them.`,
+            timestamp: '1w', type: 'follow', hasFollowButton: true, is_read: false
         },
         {
-            id: '3',
-            period: '30days',
-            users: [
-                {
-                    username: '_harijustin__',
-                    avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-                    verified: false
-                }
-            ],
-            message: 'and 8 others are on Threads, an Instagram app. See what they\'re saying.',
-            timestamp: '2w',
-            type: 'threads',
-            hasFollowButton: false,
-            is_read: true
+            id: '3', period: '30days',
+            users: [{ username: '_harijustin__', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face', verified: false }],
+            message: `and others on Threads. See what they're saying.`,
+            timestamp: '2w', type: 'threads', hasFollowButton: false, is_read: true
         }
     ];
 
-    // Group notifications by period
     const last7Days = notificationsData.filter(n => n.period === '7days');
     const last30Days = notificationsData.filter(n => n.period === '30days');
 
-    const formatUsernames = (users, message) => {
-        if (users.length === 1) {
-            return (
-                <>
-                    <strong>{users[0].username}</strong> {message}
-                </>
-            );
-        } else {
-            return (
-                <>
-                    <strong>{users[0].username}</strong> {message}
-                </>
-            );
-        }
-    };
+    const formatUsernames = (users, message) => (
+        <>
+            <strong>{users[0].username}</strong> {message}
+        </>
+    );
 
-    const getNotificationIcon = (type) => {
-        switch (type) {
-            case 'follow':
-                return (
-                    <div className="notification-icon follow">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="#0095f6" />
-                        </svg>
-                    </div>
-                );
-            case 'threads':
-                return (
-                    <div className="notification-icon threads">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 2H6C4.9 2 4 2.9 4 4V22L8 18H18C19.1 18 20 17.1 20 16V4C20 2.9 19.1 2 18 2Z" fill="#000000" />
-                        </svg>
-                    </div>
-                );
-            default:
-                return (
-                    <div className="notification-icon default">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z" fill="#ed4956" />
-                        </svg>
-                    </div>
-                );
-        }
+    const styles = {
+        container: { maxWidth: '600px', margin: '0 auto', padding: '20px 0' },
+        header: {
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px',
+            borderBottom: '1px solid #dbdbdb', backgroundColor: 'white'
+        },
+        markAllRead: {
+            background: 'none', border: 'none', color: '#0095f6', fontSize: '14px',
+            fontWeight: '600', cursor: 'pointer'
+        },
+        tabs: {
+            display: 'flex', borderBottom: '1px solid #dbdbdb', backgroundColor: 'white'
+        },
+        tab: {
+            flex: 1, background: 'none', border: 'none', padding: '16px', fontSize: '14px',
+            fontWeight: '400', color: '#8e8e8e', cursor: 'pointer', transition: 'all 0.3s ease'
+        },
+        activeTab: {
+            fontWeight: '600', color: '#262626', borderBottom: '2px solid #262626'
+        },
+        notificationItem: {
+            display: 'flex', alignItems: 'center', padding: '16px', borderBottom: '1px solid #f0f0f0',
+            backgroundColor: 'white', position: 'relative'
+        },
+        unreadItem: { backgroundColor: '#fafafa' },
+        userAvatar: {
+            width: '44px', height: '44px', borderRadius: '50%', marginRight: '12px',
+            border: '2px solid #e1306c', padding: '2px'
+        },
+        avatarImage: { width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' },
+        verified: {
+            position: 'absolute', bottom: '-2px', right: '-2px', width: '14px', height: '14px',
+            backgroundColor: '#0095f6', color: 'white', borderRadius: '50%', fontSize: '10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+        },
+        notificationContent: { flex: 1 },
+        timestamp: { fontSize: '12px', color: '#8e8e8e', marginTop: '4px' },
+        followBtn: {
+            background: '#0095f6', border: 'none', color: 'white', borderRadius: '8px',
+            padding: '6px 16px', fontSize: '14px', fontWeight: '600', cursor: 'pointer'
+        },
+        unreadIndicator: {
+            position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)',
+            width: '8px', height: '8px', backgroundColor: '#0095f6', borderRadius: '50%'
+        },
+        sectionHeader: {
+            padding: '16px', backgroundColor: '#fafafa', fontSize: '14px',
+            fontWeight: '600', color: '#8e8e8e', borderBottom: '1px solid #dbdbdb'
+        },
+        emptyState: {
+            textAlign: 'center', padding: '40px', color: '#8e8e8e'
+        },
+        emptyIcon: { fontSize: '48px', marginBottom: '16px' }
     };
 
     return (
-        <div className="instagram-notifications">
-            {/* Header */}
-            <div className="notifications-header">
-                <h2>Notifications</h2>
-                <button className="mark-all-read">
-                    Mark all as read
-                </button>
+        <div style={styles.container}>
+            <div style={styles.header}>
+                <h2 style={{ margin: 0, fontSize: '20px' }}>Notifications</h2>
+                <button style={styles.markAllRead}>Mark all as read</button>
             </div>
 
-            {/* Tabs */}
-            <div className="notifications-tabs">
-                <button
-                    className={`tab ${activeTab === 'all' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('all')}
-                >
-                    All
-                </button>
-                <button
-                    className={`tab ${activeTab === 'unread' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('unread')}
-                >
-                    Unread
-                </button>
+            <div style={styles.tabs}>
+                {['all', 'unread'].map(tab => (
+                    <button key={tab} onClick={() => setActiveTab(tab)}
+                        style={{ ...styles.tab, ...(activeTab === tab ? styles.activeTab : {}) }}>
+                        {tab === 'all' ? 'All' : 'Unread'}
+                    </button>
+                ))}
             </div>
 
-            {/* Notifications List */}
-            <div className="notifications-list">
-                {/* Last 7 Days Section */}
+            <div>
                 {last7Days.length > 0 && (
-                    <div className="notifications-section">
-                        <div className="section-header">Last 7 days</div>
+                    <div>
+                        <div style={styles.sectionHeader}>Last 7 days</div>
                         {last7Days.map(notification => (
-                            <div
-                                key={notification.id}
-                                className={`notification-item ${notification.is_read ? '' : 'unread'}`}
-                            >
-                                {/* User Avatar */}
-                                <div className="user-avatar-small">
-                                    <img
-                                        src={notification.users[0].avatar_url}
-                                        alt={notification.users[0].username}
-                                        className="avatar-image-small"
-                                        onError={(e) => {
-                                            e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face';
-                                        }}
-                                    />
-                                    {notification.users[0].verified && (
-                                        <div className="verified-small">✓</div>
-                                    )}
-                                </div>
-
-                                {/* Notification Content */}
-                                <div className="notification-content">
-                                    <div className="notification-text">
-                                        <div className="usernames">
-                                            {formatUsernames(notification.users, notification.message)}
-                                        </div>
-                                        <div className="timestamp">{notification.timestamp}</div>
+                            <div key={notification.id} style={{ ...styles.notificationItem, ...(!notification.is_read ? styles.unreadItem : {}) }}>
+                                <div style={{ position: 'relative' }}>
+                                    <div style={styles.userAvatar}>
+                                        <img src={notification.users[0].avatar_url} alt={notification.users[0].username} style={styles.avatarImage} />
                                     </div>
-
-                                    {/* Follow Button */}
-                                    {notification.hasFollowButton && (
-                                        <button className="follow-btn">
-                                            Follow
-                                        </button>
-                                    )}
+                                    {notification.users[0].verified && <div style={styles.verified}>✓</div>}
                                 </div>
-
-                                {/* Unread Indicator */}
-                                {!notification.is_read && <div className="unread-indicator"></div>}
+                                <div style={styles.notificationContent}>
+                                    <div>{formatUsernames(notification.users, notification.message)}</div>
+                                    <div style={styles.timestamp}>{notification.timestamp}</div>
+                                </div>
+                                {notification.hasFollowButton && <button style={styles.followBtn}>Follow</button>}
+                                {!notification.is_read && <div style={styles.unreadIndicator} />}
                             </div>
                         ))}
                     </div>
                 )}
 
-                {/* Last 30 Days Section */}
                 {last30Days.length > 0 && (
-                    <div className="notifications-section">
-                        <div className="section-header">Last 30 days</div>
+                    <div>
+                        <div style={styles.sectionHeader}>Last 30 days</div>
                         {last30Days.map(notification => (
-                            <div
-                                key={notification.id}
-                                className={`notification-item ${notification.is_read ? '' : 'unread'}`}
-                            >
-                                {/* User Avatar for single user notifications */}
+                            <div key={notification.id} style={{ ...styles.notificationItem, ...(!notification.is_read ? styles.unreadItem : {}) }}>
                                 {notification.type !== 'threads' ? (
-                                    <div className="user-avatar-small">
-                                        <img
-                                            src={notification.users[0].avatar_url}
-                                            alt={notification.users[0].username}
-                                            className="avatar-image-small"
-                                            onError={(e) => {
-                                                e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face';
-                                            }}
-                                        />
-                                        {notification.users[0].verified && (
-                                            <div className="verified-small">✓</div>
-                                        )}
+                                    <div style={{ position: 'relative' }}>
+                                        <div style={styles.userAvatar}>
+                                            <img src={notification.users[0].avatar_url} alt={notification.users[0].username} style={styles.avatarImage} />
+                                        </div>
+                                        {notification.users[0].verified && <div style={styles.verified}>✓</div>}
                                     </div>
                                 ) : (
-                                    /* Threads notification with multiple users */
-                                    <div className="users-avatars">
-                                        <div className="user-avatar-small">
-                                            <img
-                                                src={notification.users[0].avatar_url}
-                                                alt={notification.users[0].username}
-                                                className="avatar-image-small"
-                                                onError={(e) => {
-                                                    e.target.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face';
-                                                }}
-                                            />
+                                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                        <div style={styles.userAvatar}>
+                                            <img src={notification.users[0].avatar_url} alt={notification.users[0].username} style={styles.avatarImage} />
                                         </div>
-                                        <div className="more-users">+8</div>
+                                        <div style={{ ...styles.userAvatar, marginLeft: '-8px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600' }}>
+                                            +8
+                                        </div>
                                     </div>
                                 )}
-
-                                {/* Notification Content */}
-                                <div className="notification-content">
-                                    <div className="notification-text">
-                                        <div className="usernames">
-                                            {formatUsernames(notification.users, notification.message)}
-                                        </div>
-                                        <div className="timestamp">{notification.timestamp}</div>
-                                    </div>
-
-                                    {/* Follow Button */}
-                                    {notification.hasFollowButton && (
-                                        <button className="follow-btn">
-                                            Follow
-                                        </button>
-                                    )}
+                                <div style={styles.notificationContent}>
+                                    <div>{formatUsernames(notification.users, notification.message)}</div>
+                                    <div style={styles.timestamp}>{notification.timestamp}</div>
                                 </div>
-
-                                {/* Unread Indicator */}
-                                {!notification.is_read && <div className="unread-indicator"></div>}
+                                {notification.hasFollowButton && <button style={styles.followBtn}>Follow</button>}
+                                {!notification.is_read && <div style={styles.unreadIndicator} />}
                             </div>
                         ))}
                     </div>
                 )}
 
-                {/* Empty State */}
                 {notificationsData.length === 0 && (
-                    <div className="empty-notifications">
-                        <div className="empty-icon">🔔</div>
-                        <h3>No notifications yet</h3>
-                        <p>When you get notifications, they'll show up here.</p>
+                    <div style={styles.emptyState}>
+                        <div style={styles.emptyIcon}>🔔</div>
+                        <h3>No notifications</h3>
+                        <p>When you get notifications, they'll appear here</p>
                     </div>
                 )}
             </div>
         </div>
     );
 }
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 
+
 // Enhanced mock data for Instagram clone
 export const mockUsers = [
     {
@@ -371,7 +372,6 @@ export const mockReels = [
         audio_track: 'Workout Energy - EDM',
         user: null
     },
-    // Additional reels
     {
         id: '11',
         user_id: '4',
@@ -395,42 +395,80 @@ export const mockReels = [
         is_liked: true,
         audio_track: 'Coffee Shop - LoFi',
         user: null
+    }
+];
+
+// Add Stories Data
+export const mockStories = [
+    {
+        id: 'story_1',
+        user_id: '1',
+        username: 'johndoe',
+        avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T10:30:00Z',
+        expires_at: '2024-01-16T10:30:00Z',
+        is_viewed: false
     },
     {
-        id: '13',
+        id: 'story_2',
+        user_id: '2',
+        username: 'sarahsmith',
+        avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T09:15:00Z',
+        expires_at: '2024-01-16T09:15:00Z',
+        is_viewed: true
+    },
+    {
+        id: 'story_3',
+        user_id: '3',
+        username: 'mikejohnson',
+        avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1534367507877-0edd93bd013b?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T08:45:00Z',
+        expires_at: '2024-01-16T08:45:00Z',
+        is_viewed: false
+    },
+    {
+        id: 'story_4',
+        user_id: '4',
+        username: 'emilywilson',
+        avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T07:30:00Z',
+        expires_at: '2024-01-16T07:30:00Z',
+        is_viewed: false
+    },
+    {
+        id: 'story_5',
+        user_id: '5',
+        username: 'davidbrown',
+        avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T06:20:00Z',
+        expires_at: '2024-01-16T06:20:00Z',
+        is_viewed: true
+    },
+    {
+        id: 'story_6',
         user_id: '6',
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        caption: 'Digital art process from sketch to final render ✨ #digitalart #process #art',
-        likes: 22300,
-        comments: 789,
-        views: 340000,
-        is_liked: false,
-        audio_track: 'Digital Creation - Chill',
-        user: null
+        username: 'lisachen',
+        avatar_url: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T05:45:00Z',
+        expires_at: '2024-01-16T05:45:00Z',
+        is_viewed: false
     },
     {
-        id: '14',
+        id: 'story_7',
         user_id: '7',
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        caption: 'Mountain biking through forest trails! 🌲 #mtb #adventure #outdoors',
-        likes: 18700,
-        comments: 534,
-        views: 275000,
-        is_liked: true,
-        audio_track: 'Trail Mix - Indie Rock',
-        user: null
-    },
-    {
-        id: '15',
-        user_id: '8',
-        video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-        caption: 'Vintage fashion finds from local markets! 🎩 #vintage #fashion #thrifting',
-        likes: 15600,
-        comments: 467,
-        views: 198000,
-        is_liked: false,
-        audio_track: 'Retro Vibes - Disco',
-        user: null
+        username: 'alexrodriguez',
+        avatar_url: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face',
+        story_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop',
+        created_at: '2024-01-15T04:30:00Z',
+        expires_at: '2024-01-16T04:30:00Z',
+        is_viewed: false
     }
 ];
 
@@ -586,6 +624,15 @@ export const populateUserData = () => {
         };
     });
 
+    // Populate stories with user data safely
+    const storiesWithUsers = mockStories.map(story => {
+        const user = mockUsers.find(user => user.id === story.user_id);
+        return {
+            ...story,
+            user: user || currentUser
+        };
+    });
+
     // Populate conversations with user data
     const conversationsWithUsers = mockConversations.map(conversation => {
         const otherUserId = conversation.participant_ids.find(id => id !== 'current');
@@ -608,6 +655,7 @@ export const populateUserData = () => {
     return {
         posts: postsWithUsers,
         reels: reelsWithUsers,
+        stories: storiesWithUsers, // Add stories to the returned data
         messages: mockMessages,
         conversations: conversationsWithUsers,
         notifications: notificationsWithUsers,
